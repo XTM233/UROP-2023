@@ -2,7 +2,7 @@
 # 1. check what model finished training, append to finished.txt and move folders into finished/
 # 2. rename folders of experiments to be continued in the next round
 # 3. replenish job array with remaining set of hyperparameter, save experiment specifiations in round_n.txt
-
+# TODO extract useful functions from this, move this to batch utils
 import numpy as np
 import pandas as pd
 import os
