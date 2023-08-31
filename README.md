@@ -14,5 +14,10 @@ In consideration of these two limitations, masked language model is introduced t
 
 Fortunately, a few transformers specialized in antibody sequences have been trained and the method of training can be utilised to develope interpretable models in our cases. Specifically, a selection of heavy chains from the __________ database are aligned and used for training of a DCA model and a BERT model respectively. <!-- 介绍 bert -->
 
-## Methods
+## Results
+
+## Experimental procedures
+
+A selection of heavy chain sequences from the SAbDab database[^sabdab] is used.
  
+[sabdab]: https://opig.stats.ox.ac.uk/webapps/sabdab-sabpred/sabdab/search/

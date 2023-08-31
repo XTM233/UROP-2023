@@ -141,4 +141,5 @@ dmypy.json
 =======
 _assets/
 >>>>>>> 0418e9a (exclude data files)
-.vscode/settings.json
+.vscode/
+*.pkl
