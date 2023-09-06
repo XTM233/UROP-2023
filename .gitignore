@@ -134,6 +134,8 @@ dmypy.json
 # checkpoints
 *model/
 *test/
+model*/
+*.bin
 
 # large files
 <<<<<<< HEAD
