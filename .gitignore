@@ -142,7 +142,6 @@ tmp_trainer/
 *.pkl
 prob.pkl
 _assets/
-*.pdb
 finished/
 
 .vscode/
@@ -153,3 +152,4 @@ model-4-6-1/training_args.bin
 test-gpu.ipynb
 mlm_big-dataset.ipynb
 mlm_small-dataset-GPU.ipynb
+.archive/
