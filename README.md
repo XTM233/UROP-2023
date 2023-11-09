@@ -30,7 +30,7 @@ The hyperparameter space was extended according to the trend observed when compa
 
 A model with the lowest test loss was then selected from all 10 models with the optimal combination of hyperparameters. The output of the best model was interpreted from two perspectives:
 
-1. Comparison with predictions given by RBM <!-- introduction of RBM-->
+1. Comparison with predictions given by restricted Boltzmann machine (RBM) <!-- introduction of RBM-->
 2. Attention weights of each attention head
 
 * The code of training the MLM was adapted from antiBERTa[^antiberta].
@@ -45,13 +45,35 @@ As shown in the plot above, increase in number of hidden layers given the same n
 ![](plots/heatmap-4-4.png)
 It is found that the model with 4 heads and 6 layers perform consistently better than other models both in terms of the mean test loss and evaluation loss. Meanwhile, the improvement by increasing from 5 layers to 6 layers is slim, both in terms of the average and standard deviation. Therefore, the search is ceased though the optimal is at the edge.
 ![](plots/hs-6-6-test.png)
-![](error-bar-test-labelled.png)
+![](plots/error-bar-test-labelled.png)
 
 ### Comparison with RBM
 
+Both RBM and MLM make predictions on the masked tokens by giving a probability vector over all possible tokens.  The following points shows the predictions of both models on a arbitrary sequence from the dataset. It can be seen that they produce similar predictions especially on the positions where their positions are most deterministic.
+
+![](C:\Users\XTM23\Documents\@PARA\y2023\309-UROP\test-antiberta\plots\mlm-vs-rbm.png)
+
 ### Attention weights
 
-#### Overview of attention maps
+In general, self-attention weights of the sequences form sparse matrices, which means most of regions of sequences are barely attended. To gain meaningful insights linked with the structure of antibody, we visualise self-attentions from the second head and the last layer among the variable regions of the sequences, following the IMGT convention. 
+
+The following plot represents the attention weights from an average antibody sequences, where the sites that are most attended to are the boundaries of complementary determination regions (CDRs).
+
+![](plots\typical_seq_attention.png)The following plot shows not only "stripe" patterns along the boundaries of CDRs but also a block diagonal (though less prominent)  which represents self-attentions within each CDR. 
+
+![image-20231109172558045](C:\Users\XTM23\Documents\@PARA\y2023\309-UROP\test-antiberta\plots\example_seq_attention.png)
+
+## Future work
+
+Interpretation of transformer-based models on protein sequences in general could take place at different levels. For example, interpreting outputs using diagnostic classifiers, and interpreting embeddings or attentions in the context of protein structures. In the future, more systematic inspection of attention weights linked to contact maps could bring more insights into understanding the model. Meanwhile, paratope prediction could be a good diagnostics for the outputs.
+
+Due to the constraint of time and resources, only a small set of data has been used for training. Therefore, the statistical distribution of attention weights from the model trained on this dataset may not be representative of studying the problem of antibodies in general. The model could generalise better if a bigger dataset is used.
+
+## Acknowledgements
+
+Much appreciation goes to Dr Barbara Bravis for her supervision and hard work in guiding me through this project. I also want to thank Kevin for providing the annotated datasets and relevant scripts.
+
+## References
 
 [^antiberta]: https://github.com/alchemab/antiberta
 [^attention-interpret]: https://arxiv.org/pdf/2006.15222.pdf

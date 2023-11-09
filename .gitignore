@@ -134,13 +134,22 @@ dmypy.json
 # checkpoints
 *model/
 *test/
+model*/
+tmp_trainer/
 
 # large files
 .assets/
 *.pkl
+prob.pkl
 _assets/
+*.pdb
+finished/
 
 .vscode/
+
 model-4-6-1/config.json
 model-4-6-1/pytorch_model.bin
 model-4-6-1/training_args.bin
+test-gpu.ipynb
+mlm_big-dataset.ipynb
+mlm_small-dataset-GPU.ipynb
