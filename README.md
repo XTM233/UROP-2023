@@ -51,7 +51,7 @@ It is found that the model with 4 heads and 6 layers perform consistently better
 
 Both RBM and MLM make predictions on the masked tokens by giving a probability vector over all possible tokens.  The following points shows the predictions of both models on a arbitrary sequence from the dataset. It can be seen that they produce similar predictions especially on the positions where their positions are most deterministic.
 
-![](C:\Users\XTM23\Documents\@PARA\y2023\309-UROP\test-antiberta\plots\mlm-vs-rbm.png)
+![](plots/mlm-vs-rbm.png)
 
 ### Attention weights
 
@@ -59,9 +59,9 @@ In general, self-attention weights of the sequences form sparse matrices, which 
 
 The following plot represents the attention weights from an average antibody sequences, where the sites that are most attended to are the boundaries of complementary determination regions (CDRs).
 
-![](plots\typical_seq_attention.png)The following plot shows not only "stripe" patterns along the boundaries of CDRs but also a block diagonal (though less prominent)  which represents self-attentions within each CDR. 
+![](plots/typical_seq_attention.png)The following plot shows not only "stripe" patterns along the boundaries of CDRs but also a block diagonal (though less prominent)  which represents self-attentions within each CDR. 
 
-![image-20231109172558045](C:\Users\XTM23\Documents\@PARA\y2023\309-UROP\test-antiberta\plots\example_seq_attention.png)
+![image-20231109172558045](plots/example_seq_attention.png)
 
 ## Future work
 
