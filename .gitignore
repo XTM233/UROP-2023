@@ -11,5 +11,6 @@ model-4-6-5/
 tmp_trainer/
 attentions_4-6-1.pkl
 training/finished/
+
 *.sh
 *.pkl
