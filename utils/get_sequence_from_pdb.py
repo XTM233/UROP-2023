@@ -53,11 +53,19 @@ def main(args):
     h_seq = ''.join(h_seq)
     l_seq = ''.join(l_seq)
 
+<<<<<<< HEAD
+    with open(args.output_path + pdb + '_h.fasta', "w") as f_new:
+        f_new.writelines('>' + h_descr + '\n')
+        f_new.writelines(h_seq + '\n')
+
+    with open(args.output_path + pdb + '_l.fasta', "w") as f_new:
+=======
     with open(args.output_path + 'sabdab_h.fasta', "a") as f_new:
         f_new.writelines('>' + h_descr + '\n')
         f_new.writelines(h_seq + '\n')
 
     with open(args.output_path + 'sabdab_l.fasta', "a") as f_new:
+>>>>>>> master
         f_new.writelines('>' + l_descr + '\n')
         f_new.writelines(l_seq + '\n')
 

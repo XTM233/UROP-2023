@@ -2,13 +2,60 @@
 # 1. check what model finished training, append to finished.txt and move folders into finished/
 # 2. rename folders of experiments to be continued in the next round
 # 3. replenish job array with remaining set of hyperparameter, save experiment specifiations in round_n.txt
-
+# TODO extract useful functions from this, move this to batch utils
 import numpy as np
 import pandas as pd
 import os
-import shutil
+import csv
 
 # construct some useful functions
+
+# def generate_path(i, j, k):
+#     # return path of the latest checkpoint json file for specified model
+#     s = "-".join(["train",str(i),str(j),str(k)])
+#     lst = os.listdir("finished/"+s+"/test")
+#     cps = []
+#     for d in lst:
+#         i = int(d.split("-")[-1])
+#         cps.append(i)
+#     cps.sort()
+#     path = "/".join([s,f"test/checkpoint-{cps[-1]}","trainer_state.json"])
+#     return path
+
+def find_best_checkpoint(directory):
+    # input a string, the directory of training, containing subfolder "test"
+    # return path of the latest checkpoint json file
+    lst = os.listdir(directory+"/test")
+    cps = []
+    for d in lst:
+        i = int(d.split("-")[-1])
+        cps.append(i)
+    cps.sort()
+    path = "/".join([directory,f"test/checkpoint-{cps[-1]}","trainer_state.json"])
+    return path
+
+# transform json files into dataframe
+def read_log(filepath):
+    # return a dataframe with columns "step", "loss", "eval_loss"
+    js = pd.read_json(filepath)
+    s = js["best_model_checkpoint"][0] # the directory of best checkpoint
+    best_model_checkpoint = int(s.split("-")[-1]) # the number of steps at which the best metric is obtained
+    lst = filepath.split("checkpoint-")
+    lst = lst[1].split("/")
+    total_steps = int(lst[0])
+    df = pd.json_normalize(js["log_history"])
+    n = len(df)
+    # dataframe contianing eval loss
+    odd_indx = np.array([i for i in range(n) if i%2 == 1])
+    df1 = df.loc[odd_indx,:]
+    # dataframe contianing train loss
+    even_indx = np.array([i for i in range(n) if i%2 == 0])
+    df2 = df.loc[even_indx,:]
+
+    df1 = df1[["step", "eval_loss"]]
+    df2 = df2[["step", "loss"]]
+    df3 = df1.join(df2.set_index('step'), on='step')
+    return df3,js["best_metric"][0],best_model_checkpoint, total_steps
 
 def txt2list(filepath):
     """
@@ -25,27 +72,29 @@ def txt2list(filepath):
         lst.append(eval(line))
     return lst
 
-def list2txt(lst,filepath):
+def list2txt(lst,filepath, overwrite=True):
     """
     save content of a list into text file
     Args:
         lst: a list of tuples
         filepath: a string indicating the path of a text file
     """
-    # clear file content before writing
-    if os.path.isfile(filepath):
-        open(filepath, 'w').close()
-    with open(filepath, 'w') as f:
-        for line in lst:
-            f.write(str(line)+"\n")
+    if not overwrite:
+        with open(filepath, 'a') as f:
+            for line in lst:
+                f.write(str(line)+"\n")
+    else:
+        with open(filepath, 'w') as f:
+            for line in lst:
+                f.write(str(line)+"\n")
 
 # define a whole set of hyperparameters to run experiments on
 
-whole_set = []
-for n_head in range(1,5):
-    for n_layer in range(1,5):
-        for random_ind in range(10):
-            whole_set.append((n_head, n_layer, random_ind))
+whole_set = txt2list("TEST.txt")
+# for n_head in range(1,5):
+#     for n_layer in range(1,5):
+#         for random_ind in range(10):
+#             whole_set.append((n_head, n_layer, random_ind))
 
 whole_set = set(whole_set)
 
@@ -64,6 +113,7 @@ else:
 # load models trained in the last round
 latest_round = 0
 res = []
+log = []
 # Iterate directory to find record of previous rounds
 for file in os.listdir("./"):
     # check only text files
@@ -94,13 +144,16 @@ else:
     # for all files starting with train-, check if model folder is empty
     for i in range(32):
         train_path = f"./train-{latest_round}-{i+1}"
-        if len(os.listdir(train_path+"/model")) != 0:
-            # if best model is saved, meaning training has been finished
-            train_finished.append(last_train_array[i])
-            shutil.move(train_path, "./finished/"+train_path)
-            n_head, n_layer, rand_ind = last_train_array[i]
-            new_train_path = f"./train-{n_head}-{n_layer}-{rand_ind}"
-            os.rename("./finished/"+train_path,"./finished/"+new_train_path)
+        if len(os.listdir(train_path)) !=0:
+            if len(os.listdir(train_path+"/model")) != 0:
+                # if best model is saved, meaning training has been finished
+                train_finished.append(last_train_array[i])
+                # shutil.move(train_path, "./finished/"+train_path)
+                n_head, n_layer, rand_ind = last_train_array[i]
+                new_train_path = f"./train-{n_head}-{n_layer}-{rand_ind}"
+                os.rename(train_path,new_train_path)
+                _,best_metric,best_model_checkpoint, total_steps = read_log(find_best_checkpoint(new_train_path))
+                log.append([n_head, n_layer, rand_ind, best_metric, best_model_checkpoint, total_steps])
         else:
             current_train_array[i] = last_train_array[i]
             new_train_path =  f"./train-{latest_round+1}-{i+1}"
@@ -127,38 +180,15 @@ if os.path.isfile("index.txt"):
 with open("index.txt", 'w') as f:
     f.write(str(latest_round+1))
 
+# update log
+
+with open('log.csv', 'a', newline='') as file:
+    writer = csv.writer(file)
+    for line in log:
+        writer.writerow(line)
+
 # not used in this script, helpful for inspection of checkpoints
 
-def generate_path(i, j, k):
-    # return path of the latest checkpoint json file for specified model
-    ind = (i-1)*8+(j-1)*2+k
-    s = "train-"+str(ind)
-    lst = os.listdir(s+"/test")
-    path = "/".join([s,"test",lst[-1],"trainer_state.json"])
-    return path
-
-# transform json files into dataframe
-def read_log(filepath):
-    # return a dataframe with columns "step", "loss", "eval_loss"
-    js = pd.read_json(filepath)
-    s = js["best_model_checkpoint"][0] # the directory of best checkpoint
-    best_model_checkpoint = int(s.split("-")[-1]) # the number of steps at which the best metric is obtained
-    lst = filepath.split("checkpoint-")
-    lst = lst[1].split("/")
-    total_steps = int(lst[0])
-    df = pd.json_normalize(js["log_history"])
-    n = len(df)
-    # dataframe contianing eval loss
-    odd_indx = np.array([i for i in range(n) if i%2 == 1])
-    df1 = df.loc[odd_indx,:]
-    # dataframe contianing train loss
-    even_indx = np.array([i for i in range(n) if i%2 == 0])
-    df2 = df.loc[even_indx,:]
-
-    df1 = df1[["step", "eval_loss"]]
-    df2 = df2[["step", "loss"]]
-    df3 = df1.join(df2.set_index('step'), on='step')
-    return df3,js["best_metric"][0],best_model_checkpoint, total_steps
 
 def earlystop_detection(eval_loss, patience=10,tolarance=1e-5):
     # eval_loss: array of eval loss each eval step
