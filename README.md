@@ -1,6 +1,6 @@
 # Investigating context-dependent mutation of antibody via masked language model
 
-<!-- add coauthors-->
+> This project is done in collaboration with Dr Barbara Bravi and Kevin Michalewicz.
 
 ## Introduction
 
@@ -68,10 +68,6 @@ The following plot represents the attention weights from an average antibody seq
 Interpretation of transformer-based models on protein sequences in general could take place at different levels. For example, interpreting outputs using diagnostic classifiers, and interpreting embeddings or attentions in the context of protein structures. In the future, more systematic inspection of attention weights linked to contact maps could bring more insights into understanding the model. Meanwhile, paratope prediction could be a good diagnostics for the outputs.
 
 Due to the constraint of time and resources, only a small set of data has been used for training. Therefore, the statistical distribution of attention weights from the model trained on this dataset may not be representative of studying the problem of antibodies in general. The model could generalise better if a bigger dataset is used.
-
-## Acknowledgements
-
-Much appreciation goes to Dr Barbara Bravis for her supervision and hard work in guiding me through this project. I also want to thank Kevin for providing the annotated datasets and relevant scripts.
 
 ## References
 
